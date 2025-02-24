@@ -157,6 +157,11 @@ int main(int argc, char** argv) {
     // shaders
     const GLuint program(loadProgram(vsrc, fsrc));
 
+    // register uniform variable locations
+    const GLint aspectLoc(glGetUniformLocation(program, "aspect"));
+    const GLint sizeLoc(glGetUniformLocation(program, "size"));
+    const GLint scaleLoc(glGetUniformLocation(program, "scale"));
+
     // make a shape, 2 dimension, 5 points
     std::unique_ptr<const Shape> shape(new Shape(2, 5, rectangleVertex));
 
@@ -165,6 +170,11 @@ int main(int argc, char** argv) {
 
         // use the shader
         glUseProgram(program);
+
+        // set the uniform variable
+        glUniform1f(aspectLoc, window.getAspect());
+        glUniform2fv(sizeLoc, 1, window.getSize());
+        glUniform1f(scaleLoc, window.getScale());
 
         // draw
         shape->draw();
