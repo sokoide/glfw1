@@ -2,6 +2,8 @@
 GLuint createProgram(const char* vsrc, const char* fsrc);
 GLboolean printProgramInfoLog(GLuint program);
 GLboolean printShaderInfoLog(GLuint shader, const char* str);
+bool readShaderSource(const std::string& filename, std::vector<GLchar>& buffer);
+GLuint loadProgram(const char* vert, const char* frag);
 
 // vsrc: vertex shader source program string
 // fsrc: fragment shader source program string
@@ -78,7 +80,44 @@ GLboolean printShaderInfoLog(GLuint shader, const char* str) {
     return static_cast<GLboolean>(status);
 }
 
+// retrun buffer of the source
+bool readShaderSource(const std::string& filename,
+                      std::vector<GLchar>& buffer) {
+    // read filename into buffer
+    std::ifstream file(filename.c_str(), std::ios::binary);
+    if (!file) {
+        std::cerr << "Error: Can't open source file: " << filename << std::endl;
+        return false;
+    }
+    file.seekg(0L, std::ios::end);
+    GLsizei length = static_cast<GLsizei>(file.tellg());
+    buffer.resize(length + 1);
+    file.seekg(0L, std::ios::beg);
+    file.read(buffer.data(), length);
+    buffer[length] = '\0';
+
+    if (file.bad()) {
+        std::cerr << "Error: Can't read source file: " << filename << std::endl;
+        file.close();
+        return false;
+    }
+    file.close();
+    return true;
+}
+
+// create shaders from shader source files
+GLuint loadProgram(const std::string& vert, const std::string& frag) {
+    std::vector<GLchar> vsrc;
+    const bool vstat(readShaderSource(vert, vsrc));
+    std::vector<GLchar> fsrc;
+    const bool fstat(readShaderSource(frag, fsrc));
+    return vstat && fstat ? createProgram(vsrc.data(), fsrc.data()) : 0;
+}
+
 int main(int argc, char** argv) {
+    const std::string vsrc = "../shaders/point.vert";
+    const std::string fsrc = "../shaders/point.frag";
+
     std::cout << "hello\n" << std::endl;
 
     // glfw
@@ -118,21 +157,7 @@ int main(int argc, char** argv) {
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     // shaders
-    // vertex shader
-    static constexpr GLchar vsrc[] = "#version 150 core\n"
-                                     "in vec4 position;\n"
-                                     "void main()\n"
-                                     "{\n"
-                                     " gl_Position = position;\n"
-                                     "}\n";
-    // fragment shader
-    static constexpr GLchar fsrc[] = "#version 150 core\n"
-                                     "out vec4 fragment;\n"
-                                     "void main()\n"
-                                     "{\n"
-                                     " fragment = vec4(1.0, 0.0, 0.0, 1.0);\n"
-                                     "}\n";
-    const GLuint program(createProgram(vsrc, fsrc));
+    const GLuint program(loadProgram(vsrc, fsrc));
 
     while (glfwWindowShouldClose(window) == GL_FALSE) {
         glClear(GL_COLOR_BUFFER_BIT);
