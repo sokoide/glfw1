@@ -21,6 +21,8 @@ set (COMMON_INCLUDES
 # sources
 set(COMMON_SOURCES
 	sub.cpp
+	object.hpp
+	shape.hpp
 )
 
 set(TARGET_SOURCES
@@ -94,6 +96,10 @@ add_custom_command(OUTPUT run_command
 	USES_TERMINAL
 	COMMAND ${PROJECT_NAME}.out
 	)
+# copy compile_commands.json
+add_custom_command(TARGET run POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/compile_commands.json ${CMAKE_SOURCE_DIR}/compile_commands.json
+)
 
 # custom target: copy
 if (APPLE)
@@ -123,3 +129,4 @@ add_custom_command(OUTPUT lldb_command
 	USES_TERMINAL
 	COMMAND lldb ${PROJECT_NAME}.out
 	)
+

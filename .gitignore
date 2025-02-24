@@ -4,6 +4,7 @@ build/*
 .cache/*
 obj_dir/*
 *.user
+compile_commands.json
 
 ### macOS ###
 # General

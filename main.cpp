@@ -1,9 +1,14 @@
 #include "headers.hpp"
+#include "shape.hpp"
+
 GLuint createProgram(const char* vsrc, const char* fsrc);
 GLboolean printProgramInfoLog(GLuint program);
 GLboolean printShaderInfoLog(GLuint shader, const char* str);
 bool readShaderSource(const std::string& filename, std::vector<GLchar>& buffer);
 GLuint loadProgram(const char* vert, const char* frag);
+
+constexpr Object::Vertex rectangleVertex[] = {
+    {-0.5f, -0.5f}, {0.5f, -0.5f}, {0.5f, 0.5f}, {-0.5f, 0.5f}, {-0.1f, 0.0f}};
 
 // vsrc: vertex shader source program string
 // fsrc: fragment shader source program string
@@ -159,12 +164,16 @@ int main(int argc, char** argv) {
     // shaders
     const GLuint program(loadProgram(vsrc, fsrc));
 
+    // make a shape, 2 dimension, 5 points
+    std::unique_ptr<const Shape> shape(new Shape(2, 5, rectangleVertex));
+
     while (glfwWindowShouldClose(window) == GL_FALSE) {
         glClear(GL_COLOR_BUFFER_BIT);
-        // use the shder
+        // use the shader
         glUseProgram(program);
 
-        // TODO: draw here
+        // draw
+        shape->draw();
 
         // flip
         glfwSwapBuffers(window);
