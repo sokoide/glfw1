@@ -23,6 +23,7 @@ set(COMMON_SOURCES
 	sub.cpp
 	object.hpp
 	shape.hpp
+	window.hpp
 )
 
 set(TARGET_SOURCES

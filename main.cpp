@@ -1,5 +1,6 @@
 #include "headers.hpp"
 #include "shape.hpp"
+#include "window.hpp"
 
 GLuint createProgram(const char* vsrc, const char* fsrc);
 GLboolean printProgramInfoLog(GLuint program);
@@ -141,16 +142,7 @@ int main(int argc, char** argv) {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // make a window
-    GLFWwindow* const window(glfwCreateWindow(640, 480, "Hello!", NULL, NULL));
-    if (window == NULL) {
-        std::cerr << "Can't create GLFW window." << std::endl;
-        return 1;
-    }
-
-    // wait for vsync
-    glfwSwapInterval(1);
-
-    glfwMakeContextCurrent(window);
+    Window window;
 
     // glew
     glewExperimental = GL_TRUE;
@@ -159,6 +151,7 @@ int main(int argc, char** argv) {
         return 1;
     }
 
+    // set background color
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     // shaders
@@ -167,8 +160,9 @@ int main(int argc, char** argv) {
     // make a shape, 2 dimension, 5 points
     std::unique_ptr<const Shape> shape(new Shape(2, 5, rectangleVertex));
 
-    while (glfwWindowShouldClose(window) == GL_FALSE) {
+    while (window) {
         glClear(GL_COLOR_BUFFER_BIT);
+
         // use the shader
         glUseProgram(program);
 
@@ -176,8 +170,7 @@ int main(int argc, char** argv) {
         shape->draw();
 
         // flip
-        glfwSwapBuffers(window);
-        glfwWaitEvents();
+        window.swapBuffers();
     }
 
     return 0;
